@@ -1,0 +1,7 @@
+create view ViewProduct as
+select p.productId,p.productName,p.productDescription,p.productQuantity,p.productPrice,p.productDiscount,c.categoryName,sc.subCategoryName,b.brandName,s.supplierName from Product p,Category c,SubCategory sc,Brand b,Supplier s
+where
+p.categoryId=c.categoryId AND
+p.subCategoryId=s.subCategoryId AND
+p.brandId=b.brandId AND
+p.supplierId=s.supplierId;

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow
+                          http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+
+
+<var name="mainClass" class="com.electro.model.MainClass" />
+<var name="billingAddress" class="com.electro.model.BillingAddress" />
+<var name="shippingAddress" class="com.electro.model.ShippingAddress" />
+<var name="cartItem" class="com.electro.model.CartItem" />
+
+
+	<!-- Executed when webFlow is triggered -->
+	<on-start>
+	<!-- demohandler is java class available through annotated Demohandler.java class.here we are calling it’s initFlow() method. -->
+	  <evaluate expression="cartHandler.initFlow()" result="flowScope.mainClass"/>
+	</on-start>
+	
+	
+	
+
+
+
+<!--        billing address -->
+
+   <action-state id="getBilling">
+   <evaluate expression="userDetailsService.getBillingAddressById(externalContext.sessionMap.userId)" result="flowScope.billingAddress"></evaluate>
+   <transition on="success" to="displayBilling"></transition>
+    </action-state>
+ 
+<view-state id="displayBilling" view="DisplayBilling" model="mainClass">
+<transition on="submit" to="validateBilling"/>
+<transition on="edit" to="editBilling"/>
+</view-state>
+ 
+ <action-state id="validateBilling">
+        <evaluate expression="cartHandler.validateBillingAddress(billingAddress,messageContext)"/>
+         <transition on="success" to="getShipping" />
+        <transition on="failure" to="editBilling" />
+    </action-state>
+ 
+<view-state id="editBilling" view="BillingAddress" model="billingAddress">
+    <transition on="submit" to="validateBilling1" />
+</view-state>
+    
+    <action-state id="validateBilling1">
+        <evaluate expression="cartHandler.validateBillingAddress(billingAddress,messageContext)"/>
+         <transition on="success" to="displayBilling" />
+        <transition on="failure" to="editBilling" />
+    </action-state>
+    
+    
+<!--         shipping address -->
+    
+    <action-state id="getShipping">
+     <evaluate expression="userDetailsService.getShippingAddressById(externalContext.sessionMap.userId)" result="flowScope.shippingAddress"></evaluate>
+     <transition on="success" to="displayShipping"></transition>
+    </action-state>
+    
+<view-state id="displayShipping" view="DisplayShipping" model="shippingAddress">
+<transition on="submit" to="validateShipping"/>
+<transition on="edit" to="editShipping"/>    
+</view-state>
+    
+    <action-state id="validateShipping">
+        <evaluate expression="cartHandler.validateShippingAddress(shippingAddress,messageContext)"/>
+         <transition on="success" to="payment" />
+        <transition on="failure" to="editShipping" />
+    </action-state>
+    
+<view-state id="editShipping" view="ShippingAddress" model="shippingAddress">
+<transition on="submit" to="validateShipping1" />
+</view-state>    
+
+    <action-state id="validateShipping1">
+        <evaluate expression="cartHandler.validateShippingAddress(shippingAddress,messageContext)"/>
+         <transition on="success" to="payment" />
+        <transition on="failure" to="editShipping" />
+    </action-state>
+    
+<!--           payment -->
+
+	<view-state id="payment" view="Payment" model="cartItem">
+<transition on="submit" to="flag" />
+</view-state>    
+	
+<action-state id="flag">
+     <evaluate expression="cartItemService.updateFlag(externalContext.sessionMap.cartItemId)" result="flowScope.cartItem"></evaluate>
+     <transition  to="thankyou"></transition>
+    </action-state>
+    
+<view-state id="thankyou" view="ThankYou" model="cartItem">
+<transition on="submit" to="tohome" />
+</view-state>    
+	
+
+
+<end-state id="tohome" view="index" />
+	<end-state id="toHome" view="externalRedirect:contextRelative:index.jsp" />
+	<end-state id="toException" view="externalRedirect:contextRelative:exception.jsp" />
+
+ 
+	<global-transitions>
+		<transition on="home" to="toHome" />
+		<transition on="error" to="toException" />
+	</global-transitions>
+
+	
+	
+	
+	
+	
+	
+	</flow>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

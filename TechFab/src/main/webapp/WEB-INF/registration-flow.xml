@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow
+                          http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+
+<var name="userDetails" class="com.electro.model.UserDetails" />
+<var name="billingAddress" class="com.electro.model.BillingAddress" />
+<var name="shippingAddress" class="com.electro.model.ShippingAddress" />
+
+	<!-- Executed when webFlow is triggered -->
+	<on-start>
+	<!-- demohandler is java class available through annotated Demohandler.java class.here we are calling it’s initFlow() method. -->
+	  <evaluate expression="registrationHandler.initFlow()" result="flowScope.userDetails"/>
+	</on-start>
+	
+	<!-- if not specified the first view state is the starting state --> 
+	<view-state id="start" view="UserDetails" model="userDetails">
+	   <transition on="submit" to="validate" /> 
+	</view-state>
+	
+	<action-state id="validate"> 
+		<evaluate expression="registrationHandler.validateDetails(userDetails,messageContext)"></evaluate>
+ 		<transition on="success" to="confirmDetails" /> 
+		<transition on="failure" to="start" />
+	</action-state>
+	
+<view-state id="confirmDetails" view="ConfirmDetails" model="userDetails">
+		<transition on="edit" to="start" />
+		<transition on="submit" to="startbilling" />
+	</view-state>
+	<view-state id="startbilling" view="BillingAddress" model="billingAddress">
+	   <transition on="submit" to="addBillingAddress" /> 
+	</view-state>
+	
+	<action-state id="addBillingAddress"> 
+		<evaluate expression="registrationHandler.addBillingAddress(billingAddress)"></evaluate>
+ 		<transition on="submit" to="shipping" /> 
+	</action-state>
+	
+	<view-state id="shipping" view="ShippingAddress" model="shippingAddress">
+	   <transition on="submit" to="addShippingAddress" /> 
+	</view-state>
+	
+	<action-state id="addShippingAddress"> 
+		<evaluate expression="registrationHandler.addShippingAddress(shippingAddress)"></evaluate>
+ 		<transition on="submit" to="welcome" /> 
+	</action-state>
+	
+	
+	<action-state id="welcome"> 
+		<evaluate expression="registrationHandler.addDetails(userDetails,billingAddress,shippingAddress)"></evaluate>
+ 		<transition on="success" to="tohome" /> 
+	</action-state>
+	
+	
+	
+	<end-state id="tohome" view="index" />
+	<end-state id="toHome" view="externalRedirect:contextRelative:index.jsp" />
+	<end-state id="toException" view="externalRedirect:contextRelative:exception.jsp" />
+
+ 
+	<global-transitions>
+		<transition on="home" to="toHome" />
+		<transition on="error" to="toException" />
+	</global-transitions>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	 
+<!-- 	<action-state id="validate"> -->
+<!-- 		<evaluate expression="demohandler.validateDetails(userBean,messageContext)"></evaluate> -->
+<!-- 		<transition on="success" to="confirmDetails" /> -->
+<!-- 		<transition on="failure" to="start" /> -->
+<!-- 	</action-state> -->
+
+	
+	
+
+
+
+</flow>
